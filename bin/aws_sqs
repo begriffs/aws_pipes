@@ -52,10 +52,12 @@ begin
   q = sqs.queues.named q_name
   case operation
   when 'read'
+    $stdout.sync = true
     q.poll do |msg|
       puts msg.body
     end
   when 'write'
+    $stdin.sync = true
     while msg = gets
       q.send_message msg
     end
