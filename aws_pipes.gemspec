@@ -17,6 +17,6 @@ Gem::Specification.new do |gem|
   gem.test_files    = gem.files.grep(%r{^(test|spec|features)/})
   gem.require_paths = ["lib"]
 
-  gem.add_dependency "aws-sdk-ruby"
+  gem.add_dependency "aws-sdk"
   gem.add_dependency "trollop"
 end
