@@ -1,29 +1,22 @@
 # AwsPipes
 
-TODO: Write a gem description
+Text streams are the universal interface. This gem provides binaries to
+read and write to Amazon Web Services (AWS) using Unix pipes.
 
 ## Installation
 
-Add this line to your application's Gemfile:
+    gem install aws_pipes
 
-    gem 'aws_pipes'
-
-And then execute:
-
-    $ bundle
-
-Or install it yourself as:
-
-    $ gem install aws_pipes
 
 ## Usage
 
-TODO: Write usage instructions here
+Reading and writing to the Simple Queue Service (SQS).
 
-## Contributing
+    # write data to an SQS queue
+    your_program | sqswrite <queue-name>
+    
+    # read data from an SQS queue
+    sqsread <queue-name> | your_program
 
-1. Fork it
-2. Create your feature branch (`git checkout -b my-new-feature`)
-3. Commit your changes (`git commit -am 'Add some feature'`)
-4. Push to the branch (`git push origin my-new-feature`)
-5. Create new Pull Request
+These programs read Amazon credentials from environment variables
+or command line options.  Use `--help` to read more details.

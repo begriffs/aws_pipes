@@ -1,0 +1,38 @@
+#!/usr/bin/env ruby
+
+require 'trollop'
+require 'aws-sdk'
+require_relative '../lib/aws_pipes/version'
+
+opts = Trollop::options do
+  version "sqswrite #{AwsPipes::VERSION} (c) 2013 Joe Nelson"
+  banner <<-EOS
+Send STDIN to an Amazon SQS queue, one message per line.
+
+Program can use environment variables in place of opttions
+AWS_ACCESS_KEY_ID
+AWS_ACCESS_KEY
+
+Usage:
+       sqswrite [options] <queue-name>
+where [options] are:
+EOS
+
+  opt :keyid, "AWS access key id", :type => :string
+  opt :key, "AWS secret access key", :type => :string
+end
+
+access_key_id     = ENV['AWS_ACCESS_KEY_ID'] || opts[:keyid] || Trollop::die("Missing access key id")
+secret_access_key = ENV['AWS_ACCESS_KEY']    || opts[:key]   || Trollop::die("Missing secret access key")
+sqs = AWS::SQS.new(
+  :access_key_id     => access_key_id,
+  :secret_access_key => secret_access_key
+)
+
+q_name = ARGV.shift
+Trollop::die "Missing queue name" unless q_name
+
+q = sqs.queues.named q_name
+while msg = gets
+  q.send_message msg
+end
