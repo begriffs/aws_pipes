@@ -1,0 +1,52 @@
+#!/usr/bin/env ruby
+
+require_relative '../lib/aws_pipes'
+require 'trollop'
+require 'aws-sdk'
+require 'open-uri'
+
+opts = AwsPipes.common_aws_options(
+  "aws_log",
+  <<-EOS
+Log messages to Amazom SimpleDB with timestamp and external ip.
+
+Usage:
+       aws_log [options] record <log-name>
+       Log each line of STDIN as a message to Amazon SimpleDB
+EOS
+)
+
+operation = ARGV.shift
+unless %w(record show).include? operation
+  Trollop::die "Unknown operation \"#{operation}\" -- expecting \"record\" or \"show\""
+end
+
+match       = /([\d\.]+)/.match open('http://checkip.dyndns.org').read
+external_ip = match[1] if match
+
+sdb = AWS::SimpleDB.new(
+  :access_key_id     => AwsPipes.access_key_id(opts),
+  :secret_access_key => AwsPipes.secret_access_key(opts)
+)
+
+log_name = ARGV.shift
+Trollop::die "Missing log (SimpleDB domain) name" unless log_name
+messages = sdb.domains.create(log_name).items
+
+begin
+  case operation
+  when 'record'
+    $stdin.sync = true
+    while msg = gets
+      messages.create Time.now.strftime("%Y-%m-%d %H:%M:%S.%L"),
+        { ip: external_ip, message: msg.delete("\n") }
+    end
+  when 'show'
+    printf "%-26s%-18s%s\n", 'Timestamp', 'Public IP', 'Message'
+    messages.each do |item|
+      printf "%-26s%-18s%s\n", item.name, item.attributes[:ip].values[0], item.attributes[:message].values[0]
+    end
+  end
+rescue Interrupt
+  exit 0
+end
