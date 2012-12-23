@@ -1,19 +1,13 @@
 #!/usr/bin/env ruby
 
+require_relative '../lib/aws_pipes'
 require 'trollop'
 require 'aws-sdk'
-require_relative '../lib/aws_pipes/version'
 
-## USAGE ###########################################################################
-
-opts = Trollop::options do
-  version "aws_queue #{AwsPipes::VERSION} (c) 2013 Joe Nelson"
-  banner <<-EOS
+opts = AwsPipes.common_aws_options(
+  "aws_queue",
+  <<-EOS
 Read and write Amazon SQS through unix pipes.
-
-You may provide Amazon authentication through these environment variables:
-AWS_ACCESS_KEY_ID - AWS access key id
-AWS_ACCESS_KEY    - AWS secret access key
 
 Usage:
        aws_queue [options] write <queue-name>
@@ -21,21 +15,12 @@ Usage:
 
        aws_queue [options] read <queue-name>
        Print messages from Amazon SQS queue to STDOUT, one message per line.
-
-where [options] are:
 EOS
+)
 
-  opt :keyid, "AWS access key id", :type => :string
-  opt :key, "AWS secret access key", :type => :string
-end
-
-## SETUP ###########################################################################
-
-access_key_id     = ENV['AWS_ACCESS_KEY_ID'] || opts[:keyid] || Trollop::die("Missing access key id")
-secret_access_key = ENV['AWS_ACCESS_KEY']    || opts[:key]   || Trollop::die("Missing secret access key")
 sqs = AWS::SQS.new(
-  :access_key_id     => access_key_id,
-  :secret_access_key => secret_access_key
+  :access_key_id     => AwsPipes.access_key_id(opts),
+  :secret_access_key => AwsPipes.secret_access_key(opts)
 )
 
 operation = ARGV.shift
@@ -45,8 +30,6 @@ end
 
 q_name = ARGV.shift
 Trollop::die "Missing queue name" unless q_name
-
-## OPERATION #######################################################################
 
 begin
   q = sqs.queues.named q_name
