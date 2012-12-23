@@ -7,7 +7,6 @@ module AwsPipes
       version "#{program_name} #{VERSION} (c) 2013 Joe Nelson"
       banner <<-EOS
 #{custom_banner}
-
 You may provide Amazon authentication through these environment variables:
 AWS_ACCESS_KEY_ID - AWS access key id
 AWS_ACCESS_KEY    - AWS secret access key
