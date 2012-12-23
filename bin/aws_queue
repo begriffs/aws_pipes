@@ -62,7 +62,8 @@ begin
       q.send_message msg
     end
   end
-rescue AWS::SQS::Errors::NonExistentQueue => e
-  warn e
+rescue AWS::SQS::Errors::NonExistentQueue
+  warn "There is no queue named \"#{q_name}\" for your AWS account."
+  warn "To create this and other queues, visit https://console.aws.amazon.com/sqs/"
   exit 1
 end
