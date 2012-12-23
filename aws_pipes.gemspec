@@ -8,8 +8,8 @@ Gem::Specification.new do |gem|
   gem.version       = AwsPipes::VERSION
   gem.authors       = ["Joe Nelson"]
   gem.email         = ["cred+github@begriffs.com"]
-  gem.description   = %q{TODO: Write a gem description}
-  gem.summary       = %q{Amazon Web Services à la Unix}
+  gem.description   = %q{Send messages between Amazon EC2 instances through Unix pipes.}
+  gem.summary       = %q{AWS queues à la Unix}
   gem.homepage      = "https://github.com/begriffs/aws_pipes"
 
   gem.files         = `git ls-files`.split($/)

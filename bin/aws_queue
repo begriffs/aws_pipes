@@ -7,7 +7,7 @@ require_relative '../lib/aws_pipes/version'
 ## USAGE ###########################################################################
 
 opts = Trollop::options do
-  version "aws_sqs #{AwsPipes::VERSION} (c) 2013 Joe Nelson"
+  version "aws_queue #{AwsPipes::VERSION} (c) 2013 Joe Nelson"
   banner <<-EOS
 Read and write Amazon SQS through unix pipes.
 
@@ -16,10 +16,10 @@ AWS_ACCESS_KEY_ID - AWS access key id
 AWS_ACCESS_KEY    - AWS secret access key
 
 Usage:
-       aws_sqs [options] write <queue-name>
+       aws_queue [options] write <queue-name>
        Send STDIN to an Amazon SQS queue, one message per line.
 
-       aws_sqs [options] read <queue-name>
+       aws_queue [options] read <queue-name>
        Print messages from Amazon SQS queue to STDOUT, one message per line.
 
 where [options] are:
