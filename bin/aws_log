@@ -14,15 +14,19 @@ Usage:
        aws_log [options] record <log-name>
        Log each line of STDIN as a message to Amazon SimpleDB
 EOS
-)
+) do
+  opt :'include-ip', "Include external ip in logs", :type => :boolean, :default => true
+end
 
 operation = ARGV.shift
 unless %w(record show).include? operation
   Trollop::die "Unknown operation \"#{operation}\" -- expecting \"record\" or \"show\""
 end
 
-match       = /([\d\.]+)/.match open('http://checkip.dyndns.org').read
-external_ip = match[1] if match
+if opts[:'include-ip']
+  match       = /([\d\.]+)/.match open('http://checkip.dyndns.org').read
+  external_ip = match[1] if match
+end
 
 sdb = AWS::SimpleDB.new(
   :access_key_id     => AwsPipes.access_key_id(opts),
@@ -39,7 +43,7 @@ begin
     $stdin.sync = true
     while msg = gets
       messages.create Time.now.strftime("%Y-%m-%d %H:%M:%S.%L"),
-        { ip: external_ip, message: msg.delete("\n") }
+        { ip: external_ip || 'none', message: msg.delete("\n") }
     end
   when 'show'
     printf "%-26s%-18s%s\n", 'Timestamp', 'Public IP', 'Message'

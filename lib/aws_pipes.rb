@@ -2,7 +2,7 @@ require "aws_pipes/version"
 require 'trollop'
 
 module AwsPipes
-  def AwsPipes.common_aws_options program_name, custom_banner
+  def AwsPipes.common_aws_options program_name, custom_banner, &more_opts
     ::Trollop::options do
       version "#{program_name} #{VERSION} (c) 2013 Joe Nelson"
       banner <<-EOS
@@ -15,6 +15,8 @@ Additional options:
 EOS
       opt :keyid, "AWS access key id", :type => :string
       opt :key, "AWS secret access key", :type => :string
+
+      self.instance_eval &more_opts if more_opts
     end
   end
 
