@@ -13,14 +13,23 @@ Log messages to Amazom SimpleDB with timestamp and external ip.
 Usage:
        aws_log [options] record <log-name>
        Log each line of STDIN as a message to Amazon SimpleDB
+
+       aws_log [options] show <log-name>
+       Display log
+
+       aws_log [options] delete <log-name>
+       Delete all messages in log
 EOS
 ) do
   opt :'include-ip', "Include external ip in logs", :type => :boolean, :default => true
+  opt :count, "Only show how many messages are in log", :type => :boolean, :default => false
+  opt :before, "Show messages recorded before timestamp", :type => :string
+  opt :after, "Show messages recorded after timestamp", :type => :string
 end
 
 operation = ARGV.shift
-unless %w(record show).include? operation
-  Trollop::die "Unknown operation \"#{operation}\" -- expecting \"record\" or \"show\""
+unless %w(record show delete).include? operation
+  Trollop::die "Unknown operation \"#{operation}\" -- expecting \"record\", \"show\", or \"delete\""
 end
 
 if opts[:'include-ip']
@@ -35,7 +44,10 @@ sdb = AWS::SimpleDB.new(
 
 log_name = ARGV.shift
 Trollop::die "Missing log (SimpleDB domain) name" unless log_name
+
 messages = sdb.domains.create(log_name).items
+messages = messages.where("itemName() <= \"#{opts[:before]}\"") if opts[:before]
+messages = messages.where("itemName() >= \"#{opts[:after]}\"") if opts[:after]
 
 begin
   case operation
@@ -46,10 +58,16 @@ begin
         { ip: external_ip || 'none', message: msg.delete("\n") }
     end
   when 'show'
-    printf "%-26s%-18s%s\n", 'Timestamp', 'Public IP', 'Message'
-    messages.each do |item|
-      printf "%-26s%-18s%s\n", item.name, item.attributes[:ip].values[0], item.attributes[:message].values[0]
+    if opts[:count]
+      puts messages.count
+    else
+      printf "%-26s%-18s%s\n", 'Timestamp', 'Public IP', 'Message'
+      messages.each do |item|
+        printf "%-26s%-18s%s\n", item.name, item.attributes[:ip].values[0], item.attributes[:message].values[0]
+      end
     end
+  when 'delete'
+    sdb.domains[log_name].delete!
   end
 rescue Interrupt
   exit 0
