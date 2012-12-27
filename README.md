@@ -36,7 +36,7 @@ top of Amazon [SimpleDB](http://aws.amazon.com/simpledb/).
 
     # write data to an SQS queue named "foo"
     your_program | aws_queue write foo
-    
+
     # read data from an SQS queue named "foo"
     aws_queue read foo | your_program
 
@@ -47,10 +47,10 @@ queue](https://console.aws.amazon.com/sqs/) in the Amazon Web Console.
 
     # write stderr to log named "bar"
     your_program 2> >(aws_log record bar)
-    
+
     # delete all messages in log named "bar"
     aws_log delete bar
-    
+
     # View log entries for "bar" within a date range
     aws_log show bar --after "1970-01-01" --before "2020-02-02 13:42:12.123"
 
