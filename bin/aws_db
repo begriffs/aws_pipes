@@ -1,0 +1,43 @@
+#!/usr/bin/env ruby
+
+require_relative '../lib/aws_pipes'
+require 'trollop'
+require 'aws-sdk'
+require 'open-uri'
+
+opts = AwsPipes.common_aws_options(
+  "aws_db",
+  <<-EOS
+Write rows to Amazom DynamoDB.
+
+Usage:
+       aws_db [options] table-name col1 [col2 col3 ...]
+       Save each tab-delimited line of STDIN as a row in Amazon DynamoDB
+EOS
+)
+
+table_name = ARGV.shift
+unless table_name
+  Trollop::die "Please provide table name"
+end
+
+col_names = ARGV
+if col_names.length == 0
+  Trollop::die "Please provide column names"
+end
+
+db = AWS::DynamoDB.new(
+  :access_key_id     => AwsPipes.access_key_id(opts),
+  :secret_access_key => AwsPipes.secret_access_key(opts)
+)
+
+begin
+  $stdin.sync = true
+  table = db.tables[table_name]
+  table.load_schema
+  while row = $stdin.gets
+    table.items.create Hash[col_names.zip(row.split "\t")]
+  end
+rescue Interrupt
+  exit 0
+end
