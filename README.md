@@ -66,6 +66,13 @@ ss-Substitution):
     # while logging stderr to a log named "bar"
     your_program 1> >(aws_queue write foo) 2> >(aws_log record bar)
 
+### aws_db
+
+    # save each tab-delimited line of as a row in DynamoDB table foo
+    # filling in columns a, b, and c
+    your_program | aws_db foo a b c
+
+
 ## Installation
 
 1. Sign up for an [AWS account](http://aws.amazon.com/).
