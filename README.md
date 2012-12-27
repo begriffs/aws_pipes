@@ -58,9 +58,8 @@ Each line sent to the log gets marked with a timestamp and the external
 IP address of the machine which added it.
 
 You can combine queuing and logging in
-a single command using Bash [process
-substitution](http://www.gnu.org/software/bash/manual/bashref.html#Proce
-ss-Substitution):
+a single command using Bash [process substitution](
+http://www.gnu.org/software/bash/manual/bashref.html#Process-Substitution):
 
     # write stdout to an SQS queue named "foo"
     # while logging stderr to a log named "bar"
