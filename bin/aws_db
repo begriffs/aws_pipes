@@ -31,13 +31,25 @@ db = AWS::DynamoDB.new(
   :secret_access_key => AwsPipes.secret_access_key(opts)
 )
 
-begin
-  $stdin.sync = true
-  table = db.tables[table_name]
-  table.load_schema
-  while row = $stdin.gets
+$stdin.sync = true
+table = db.tables[table_name]
+table.load_schema
+
+while row = $stdin.gets
+  begin
     table.items.create Hash[col_names.zip(row.split "\t")]
+  rescue AWS::DynamoDB::Errors::ProvisionedThroughputExceededException
+    new_write_capacity = table.write_capacity_units * 2
+    warn "Exceeded provisioned throughput for table #{table_name}."
+    warn "Increasing write capacity to #{new_write_capacity}."
+    begin
+      table.provision_throughput :write_capacity_units => new_write_capacity
+    rescue AWS::DynamoDB::Errors::ResourceInUseException
+      # throughput provisioning in progress, give it time
+      sleep 10
+    end
+    retry
+  rescue Interrupt
+    exit 0
   end
-rescue Interrupt
-  exit 0
 end
