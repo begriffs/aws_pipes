@@ -32,8 +32,14 @@ db = AWS::DynamoDB.new(
 )
 
 $stdin.sync = true
-table = db.tables[table_name]
-table.load_schema
+begin
+  table = db.tables[table_name]
+  table.load_schema
+rescue AWS::DynamoDB::Errors::ResourceNotFoundException
+  warn "There is no DynamoDB table named \"#{table_name}\" for your AWS account."
+  warn "To create this and other tables, visit https://console.aws.amazon.com/dynamodb/"
+  exit 1
+end
 
 while row = $stdin.gets
   begin
