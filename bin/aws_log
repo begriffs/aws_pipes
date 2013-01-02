@@ -71,4 +71,7 @@ begin
   end
 rescue Interrupt
   exit 0
+rescue Timeout::Error
+  warn "aws_log retrying after Timeout::Error"
+  retry
 end

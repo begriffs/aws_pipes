@@ -51,5 +51,8 @@ while row = $stdin.gets
     retry
   rescue Interrupt
     exit 0
+  rescue Timeout::Error
+    warn "aws_db retrying after Timeout::Error"
+    retry
   end
 end

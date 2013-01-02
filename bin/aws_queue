@@ -51,4 +51,7 @@ rescue AWS::SQS::Errors::NonExistentQueue
   exit 1
 rescue Interrupt
   exit 0
+rescue Timeout::Error
+  warn "aws_queue retrying after Timeout::Error"
+  retry
 end
