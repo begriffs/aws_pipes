@@ -1,6 +1,6 @@
 ## Overview
 
-### Communicating
+### Communication
 
 Send messages between Amazon EC2 instances through Unix pipes.
 
@@ -29,6 +29,18 @@ top of Amazon [SimpleDB](http://aws.amazon.com/simpledb/).
 - Monitor and query logs from one place.
 - Save as much log history as you want, the storage is virtually
   unlimited.
+
+### Saving Datasets
+
+Save data across EC2 instances with scalable throughput.
+Data archival in aws_pipes is built on top of Amazon
+[DynamoDB](http://aws.amazon.com/dynamodb/).
+
+- Store data centrally.
+- Automatically scale throughput and space.
+- Query results (albeit not relationally).
+- Monitor data acquisition through web control panel.
+- Can export to S3.
 
 ## Usage
 
@@ -72,6 +84,11 @@ ss-Substitution):
     # filling in columns a, b, and c
     your_program | aws_db foo a b c
 
+DynamoDB tables have adjustable read- and write-throughput settings to
+scale as needed. The `aws_db` command will automatically re-provision
+write throughput if writing starts getting throttled. This makes
+`aws_db` (when run in parallel) a way to save virtually unlimited
+amounts of data as quickly as necessary.
 
 ## Installation
 
