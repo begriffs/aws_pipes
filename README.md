@@ -48,7 +48,7 @@ Data archival in aws_pipes is built on top of Amazon
 
     # write data to an SQS queue named "foo"
     your_program | aws_queue write foo
-    
+
     # read data from an SQS queue named "foo"
     aws_queue read foo | your_program
 
@@ -59,10 +59,10 @@ queue](https://console.aws.amazon.com/sqs/) in the Amazon Web Console.
 
     # write stderr to log named "bar"
     your_program 2> >(aws_log record bar)
-    
+
     # delete all messages in log named "bar"
     aws_log delete bar
-    
+
     # View log entries for "bar" within a date range
     aws_log show bar --after "1970-01-01" --before "2020-02-02 13:42:12.123"
 
@@ -70,9 +70,8 @@ Each line sent to the log gets marked with a timestamp and the external
 IP address of the machine which added it.
 
 You can combine queuing and logging in
-a single command using Bash [process
-substitution](http://www.gnu.org/software/bash/manual/bashref.html#Proce
-ss-Substitution):
+a single command using Bash [process substitution](
+http://www.gnu.org/software/bash/manual/bashref.html#Process-Substitution):
 
     # write stdout to an SQS queue named "foo"
     # while logging stderr to a log named "bar"
